@@ -1,6 +1,6 @@
 # 手撕 Mini LLaMA
 
-用 PyTorch 写一个小型 LLaMA，主要是为了学习模型结构。包含 RMSNorm、RoPE、GQA、SwiGLU 和 KV cache，代码里加了中文注释。
+用 PyTorch 写一个小型 LLaMA，主要是为了学习模型结构。包含 RMSNorm、RoPE、GQA、SwiGLU 和 KV cache。
 
 使用字符级 tokenizer，可以在示例文本上训练，然后给一段开头让模型续写。这是从头训练的小模型，没有加载官方权重。
 
