@@ -1,0 +1,27 @@
+# 默认忽略主目录中的所有条目
+/*
+
+# 只纳入忽略规则和五个学习目录
+!/.gitignore
+!/1_pytorch/
+!/2_fastapi/
+!/3_model/
+!/4_transformer/
+!/5_llama/
+
+# 排除 Python 虚拟环境和缓存
+.venv/
+.venv_*/
+venv/
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+
+# 排除本地环境变量，保留示例配置
+.env
+.env.*
+!.env.example
+
+# 排除下载的模型和数据集
+/3_model/Qwen3-8B-AWQ/
+/3_model/dataset/
