@@ -1,4 +1,4 @@
-"""数字序列反转任务：例如输入 1 2 3，期望输出 3 2 1。"""
+"""生成数字反转数据。"""
 
 import random
 from collections.abc import Sequence
@@ -12,11 +12,11 @@ PAD_ID = 0
 BOS_ID = 1
 EOS_ID = 2
 DIGIT_OFFSET = 3
-VOCAB_SIZE = 13  # PAD、BOS、EOS，加上数字 0～9。
+VOCAB_SIZE = 13  # 3 个特殊符号 + 10 个数字
 
 
 def encode_numbers(numbers: Sequence[int]) -> list[int]:
-    """数字与 token ID 不是一回事：数字 0 对应 token 3，不是 PAD。"""
+    """数字加 3 得到 token ID，前 3 个 ID 留给特殊符号。"""
     if not numbers or any(number < 0 or number > 9 for number in numbers):
         raise ValueError("输入必须是非空数字序列，每个数字在 0～9 之间")
     return [number + DIGIT_OFFSET for number in numbers]
@@ -53,11 +53,9 @@ class ReverseDataset(Dataset):
 
 
 def collate_batch(batch: list[tuple[list[int], list[int]]]) -> tuple[Tensor, Tensor, Tensor]:
-    """右侧补 PAD，再切出错开一位的 Decoder 输入和监督标签。
+    """右侧补 PAD，输入和标签错开一位。
 
-    完整目标：[BOS, 3, 2, 1, EOS]
-    Decoder 输入：[BOS, 3, 2, 1]，标签：[3, 2, 1, EOS]。
-    这里的 1/2/3 表示数字，实际存储的是它们对应的 token ID。
+    比如目标是 [BOS, a, b, EOS]，输入取 [BOS, a, b]，标签取 [a, b, EOS]。
     """
     src_length = max(len(src) for src, _ in batch)
     tgt_length = max(len(tgt) for _, tgt in batch)

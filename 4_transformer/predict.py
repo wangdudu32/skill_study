@@ -1,4 +1,4 @@
-"""加载模型并自回归生成：python3 predict.py --numbers 1 2 3 4。"""
+"""加载模型，预测反转后的数字序列。"""
 
 import argparse
 from pathlib import Path
@@ -38,7 +38,7 @@ def main() -> None:
     model = Transformer(config).to(device)
     model.load_state_dict(checkpoint["model_state_dict"])
     src = torch.tensor([src_tokens], dtype=torch.long, device=device)
-    # 反转后的数字个数不变，另外预留一个 EOS。
+    # 数字个数不变，再留一个位置给 EOS
     output = greedy_decode(model, src, max_new_tokens=len(src_tokens))[0].tolist()
     print(f"输入：{args.numbers}")
     print(f"预测：{decode_numbers(output)}")

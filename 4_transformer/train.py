@@ -1,4 +1,4 @@
-"""训练入口：python3 train.py；默认使用一个适合 CPU 的小模型。"""
+"""训练数字反转任务。"""
 
 import argparse
 import random
@@ -25,7 +25,7 @@ def train_epoch(model, loader, optimizer, device) -> float:
         logits = model(src, decoder_input)
         loss_sum = criterion(logits.reshape(-1, VOCAB_SIZE), labels.reshape(-1))
         token_count = (labels != PAD_ID).sum().item()
-        # 按有效 token 平均，避免长序列/补齐长度改变梯度的尺度。
+        # 只按非 PAD 的 token 数算平均 loss
         loss = loss_sum / token_count
         loss.backward()
         nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
@@ -49,8 +49,8 @@ def evaluate(model, loader, device) -> dict[str, float]:
         correct_tokens += ((logits.argmax(dim=-1) == labels) & valid).sum().item()
         total_tokens += valid.sum().item()
 
-        # 必须真正逐 token 生成，才能检验推理时的表现。
-        # token accuracy 使用真实前缀；sequence accuracy 只使用模型自己的输出。
+        # 上面用的是真实前缀，这里让模型自己一步步生成
+        # 整条序列都对才算正确
         generated = greedy_decode(model, src, max_new_tokens=labels.size(1))[:, 1:]
         predictions = torch.full_like(labels, PAD_ID)
         predictions[:, : generated.size(1)] = generated
@@ -112,14 +112,14 @@ def main() -> None:
             num_decoder_layers=args.layers,
             d_ff=args.d_ff,
             dropout=args.dropout,
-            max_len=args.max_length + 1,  # 数字之外，预留一个 EOS/BOS 位置。
+            max_len=args.max_length + 1,  # 给 EOS/BOS 多留一个位置
             pad_id=PAD_ID,
         )
     except ValueError as error:
         parser.error(str(error))
     train_data = ReverseDataset(args.train_size, args.min_length, args.max_length, args.seed)
     val_data = ReverseDataset(args.val_size, args.min_length, args.max_length, args.seed + 1)
-    # 独立 generator，避免模型初始化等操作改变 DataLoader 的打乱顺序。
+    # 数据打乱单独用一个随机数生成器
     generator = torch.Generator().manual_seed(args.seed)
     train_loader = DataLoader(
         train_data, batch_size=args.batch_size, shuffle=True,
@@ -137,7 +137,7 @@ def main() -> None:
     for epoch in range(1, args.epochs + 1):
         train_loss = train_epoch(model, train_loader, optimizer, device)
         metrics = evaluate(model, val_loader, device)
-        # 优先保存自回归整序列准确率更高的模型；相同时选验证 loss 更低的。
+        # 先看整条序列的准确率，一样时再比较 loss
         score = (metrics["sequence_accuracy"], -metrics["loss"])
         improved = score > best_score
         if improved:

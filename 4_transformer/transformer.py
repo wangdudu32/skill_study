@@ -1,7 +1,6 @@
-"""从基础 PyTorch 算子实现 Encoder–Decoder Transformer。
+"""Transformer 模型。
 
-阅读顺序：掩码 → 注意力 → 多头注意力 → LayerNorm/位置编码 → Encoder/Decoder。
-形状约定：B=batch，S=源序列长度，T=目标序列长度，D=d_model，H=头数。
+B: batch 大小，S/T: 源/目标长度，D: 隐藏维度，H: 头数。
 """
 
 import math
@@ -40,15 +39,15 @@ class TransformerConfig:
 
 
 def make_padding_mask(tokens: Tensor, pad_id: int) -> Tensor:
-    """[B, L] → [B, 1, 1, L]；本项目统一用 True 表示允许关注。"""
+    """屏蔽 PAD，True 表示可以关注。形状：[B, L] → [B, 1, 1, L]。"""
     if tokens.ndim != 2 or tokens.size(1) == 0:
         raise ValueError("tokens 必须是形状为 [batch, 非零长度] 的张量")
-    # 遮住 key 中的 PAD；在头维度和 query 长度维度上广播。
+    # 每个头、每个 query 共用这份 PAD mask
     return (tokens != pad_id)[:, None, None, :]
 
 
 def make_causal_mask(length: int, device: torch.device | None = None) -> Tensor:
-    """[1, 1, T, T] 下三角掩码：位置 i 只能看到位置 j <= i。"""
+    """只允许看当前位置和前面的位置，形状为 [1, 1, T, T]。"""
     return torch.ones(length, length, dtype=torch.bool, device=device).tril()[None, None]
 
 
@@ -59,18 +58,18 @@ def scaled_dot_product_attention(
     mask: Tensor | None = None,
     dropout: nn.Dropout | None = None,
 ) -> tuple[Tensor, Tensor]:
-    """手写 softmax(QKᵀ / √d_k)V；返回上下文和 dropout 前的注意力权重。
+    """计算 softmax(QKᵀ / √d_k)V，返回结果和 dropout 前的权重。
 
     Q: [B, H, Lq, d_k]，K/V: [B, H, Lk, d_k]。
-    mask 必须是 bool，且可以广播到 [B, H, Lq, Lk]。
+    mask 用 bool，可广播到 [B, H, Lq, Lk]，True 表示保留。
     """
     scores = query @ key.transpose(-2, -1) / math.sqrt(query.size(-1))
     if mask is not None:
         if mask.dtype != torch.bool:
             raise TypeError("注意力 mask 必须是 bool，True 表示允许关注")
         scores = scores.masked_fill(~mask, float("-inf"))
-        # 整行都被遮住时，softmax([-inf, ...]) 会产生 NaN。
-        # 先将这样的行设为 0，softmax 后再把被遮住的权重清零。
+        # 整行都是 -inf 时，softmax 会得到 NaN，所以先置零
+        # softmax 后再把这些位置的权重清零
         scores = scores.masked_fill(~mask.any(dim=-1, keepdim=True), 0.0)
     weights = torch.softmax(scores, dim=-1)
     if mask is not None:
@@ -111,7 +110,7 @@ class MultiHeadAttention(nn.Module):
 
 
 class LayerNorm(nn.Module):
-    """只沿最后一个维度归一化，每个 token 单独计算均值和方差。"""
+    """每个 token 按最后一维做归一化。"""
 
     def __init__(self, d_model: int, eps: float = 1e-5) -> None:
         super().__init__()
@@ -121,7 +120,7 @@ class LayerNorm(nn.Module):
 
     def forward(self, x: Tensor) -> Tensor:
         mean = x.mean(dim=-1, keepdim=True)
-        # LayerNorm 使用总体方差，分母是 D，不是 D - 1。
+        # 方差除以 D，不是 D - 1
         variance = (x - mean).square().mean(dim=-1, keepdim=True)
         normalized = (x - mean) / torch.sqrt(variance + self.eps)
         return self.weight * normalized + self.bias
@@ -134,9 +133,9 @@ class SinusoidalPositionalEncoding(nn.Module):
         frequency = torch.exp(torch.arange(0, d_model, 2) * (-math.log(10000.0) / d_model))
         pe = torch.zeros(max_len, d_model)
         pe[:, 0::2] = torch.sin(position * frequency)
-        # 截断频率，使奇数 d_model 也可以使用。
+        # d_model 为奇数时，cos 比 sin 少一个位置
         pe[:, 1::2] = torch.cos(position * frequency[: d_model // 2])
-        # buffer 随模型迁移设备、保存到 checkpoint，但不参与梯度更新。
+        # 位置编码不用训练，但要跟着模型保存和移动设备
         self.register_buffer("pe", pe.unsqueeze(0))  # [1, max_len, D]
         self.dropout = nn.Dropout(dropout)
 
@@ -154,7 +153,7 @@ class PositionwiseFeedForward(nn.Module):
         self.dropout = nn.Dropout(dropout)
 
     def forward(self, x: Tensor) -> Tensor:
-        # [B, L, D] → [B, L, d_ff] → [B, L, D]；不同位置共享同一组参数。
+        # [B, L, D] → [B, L, d_ff] → [B, L, D]，每个位置用同一组参数
         return self.fc2(self.dropout(torch.relu(self.fc1(x))))
 
 
@@ -168,7 +167,7 @@ class EncoderLayer(nn.Module):
         self.dropout = nn.Dropout(config.dropout)
 
     def forward(self, x: Tensor, src_mask: Tensor) -> Tensor:
-        # 原论文使用 Post-LN：LayerNorm(x + Dropout(Sublayer(x)))。
+        # 先做残差相加，再做 LayerNorm（Post-LN）
         attended = self.self_attention(x, x, x, src_mask)
         x = self.norm1(x + self.dropout(attended))
         return self.norm2(x + self.dropout(self.feed_forward(x)))
@@ -188,7 +187,7 @@ class DecoderLayer(nn.Module):
     def forward(self, x: Tensor, memory: Tensor, tgt_mask: Tensor, src_mask: Tensor) -> Tensor:
         attended = self.self_attention(x, x, x, tgt_mask)
         x = self.norm1(x + self.dropout(attended))
-        # 交叉注意力：Q 来自 Decoder，K/V 来自 Encoder，Lq 和 Lk 可以不同。
+        # Q 用 Decoder 的输出，K/V 用 Encoder 的输出，两边长度可以不同
         attended = self.cross_attention(x, memory, memory, src_mask)
         x = self.norm2(x + self.dropout(attended))
         return self.norm3(x + self.dropout(self.feed_forward(x)))
@@ -214,7 +213,7 @@ class Transformer(nn.Module):
         for parameter in self.parameters():
             if parameter.dim() > 1:
                 nn.init.xavier_uniform_(parameter)
-        # Xavier 会覆盖 embedding 的 PAD 行，因此重新置零。
+        # 初始化后把 PAD 对应的向量清零
         with torch.no_grad():
             self.src_embedding.weight[self.config.pad_id].zero_()
             self.tgt_embedding.weight[self.config.pad_id].zero_()
@@ -232,7 +231,7 @@ class Transformer(nn.Module):
         x = self.position(self.tgt_embedding(tgt) * math.sqrt(self.config.d_model))
         for layer in self.decoder_layers:
             x = layer(x, memory, tgt_mask, src_mask)
-        # 返回原始 logits；CrossEntropyLoss 内部会计算 log_softmax。
+        # 这里不用 softmax，交叉熵会处理
         return self.output_projection(x)  # [B, T, tgt_vocab_size]
 
     def forward(self, src: Tensor, tgt: Tensor) -> Tensor:
@@ -248,10 +247,10 @@ def greedy_decode(
     bos_id: int = 1,
     eos_id: int = 2,
 ) -> Tensor:
-    """从 BOS 开始，每次追加概率最大的 token；返回包含 BOS/EOS 的批量序列。
+    """从 BOS 开始，每次选概率最大的 token。
 
-    每条序列遇到 EOS 后只补 PAD，所有序列结束后提前退出。
-    为方便阅读，这里每步重新计算 Decoder，没有实现 KV cache。
+    返回结果包含 BOS，遇到 EOS 的序列后面补 PAD。
+    每步都重新计算 Decoder，没有做 KV cache。
     """
     if not 1 <= max_new_tokens <= model.config.max_len:
         raise ValueError("max_new_tokens 必须在 [1, model.config.max_len] 内")
@@ -267,7 +266,7 @@ def greedy_decode(
         finished = torch.zeros(src.size(0), dtype=torch.bool, device=src.device)
         for _ in range(max_new_tokens):
             logits = model.decode(generated, memory, src_mask)[:, -1, :]
-            # BOS 只用于启动，PAD 只用于补齐，二者都不作为有效输出。
+            # 生成时不选 BOS 和 PAD
             logits[:, [bos_id, model.config.pad_id]] = float("-inf")
             next_token = logits.argmax(dim=-1)
             next_token = next_token.masked_fill(finished, model.config.pad_id)

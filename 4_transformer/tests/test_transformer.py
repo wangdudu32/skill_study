@@ -1,4 +1,4 @@
-"""运行：python3 -m unittest discover -s tests -v。"""
+"""测试模型计算和训练。"""
 
 import math
 import tempfile
@@ -152,7 +152,7 @@ class TransformerTests(unittest.TestCase):
         padded_tgt = F.pad(tgt, (0, 2), value=PAD_ID)
         with torch.no_grad():
             expected = model(src, tgt)
-            # 即使 PAD 的 embedding 被大幅改动，也不能通过 key/value 泄漏到有效位置。
+            # 改动 PAD 向量后，正常位置的结果应该不变
             model.src_embedding.weight[PAD_ID].fill_(1000)
             model.tgt_embedding.weight[PAD_ID].fill_(-1000)
             actual = model(padded_src, padded_tgt)
