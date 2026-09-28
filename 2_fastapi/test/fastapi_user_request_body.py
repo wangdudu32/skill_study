@@ -14,3 +14,4 @@ async def post_user(user:User):
             "user_name":user.username,
             "user_email":user.email
             }
+
