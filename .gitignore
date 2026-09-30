@@ -8,6 +8,7 @@
 !/3_model/
 !/4_transformer/
 !/5_llama/
+!/6_rag/
 
 # 排除 Python 虚拟环境和缓存
 .venv/
