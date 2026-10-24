@@ -1,0 +1,5 @@
+.env
+.venv/
+.react/
+__pycache__/
+*.pyc
