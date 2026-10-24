@@ -9,6 +9,10 @@
 !/4_transformer/
 !/5_llama/
 !/6_rag/
+!/7_vue/
+!/8_html/
+!/9_mcp/
+!/10_React_and_PA/
 
 # 排除 Python 虚拟环境和缓存
 .venv/
