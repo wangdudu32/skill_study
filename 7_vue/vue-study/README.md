@@ -1,38 +1,146 @@
-# vue-study
+# Vue 学习实验室
 
-This template should help get you started developing with Vue 3 in Vite.
+先读懂源码，再亲手实现功能。基于 Vue 3、Vite 和 JavaScript，使用 `<script setup>`。
 
-## Recommended IDE Setup
+每课按「体验参考演示 → 阅读源码 → 修改练习 → 手动验证 → 按需查看提示」展开。目前开放计数器和个人资料编辑器两课。
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+## 启动
 
-## Recommended Browser Setup
-
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
+Node.js 要求：`^22.18.0 || >=24.12.0`，以 `package.json` 的 `engines` 为准。
 
 ```sh
 npm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
 npm run dev
 ```
 
-### Compile and Minify for Production
+打开终端输出的本地地址。其他命令：
 
 ```sh
-npm run build
+npm run build    # 生产构建
+npm run preview  # 预览构建产物，不是开发热更新
 ```
+
+写练习时请使用 `npm run dev`。在代码编辑器保存文件后，页面效果和源码面板会随热更新同步；源码面板是只读展示，不能在网页里编辑。
+
+## 第一次学习怎么开始
+
+1. 先体验第一课的「参考演示」，观察加减、重置和禁用状态。
+2. 打开 `src/lessons/01-counter/CounterDemo.vue`，按页面阅读路线找到状态、函数和模板。
+3. 打开同目录的 `CounterPractice.vue`，从 `TODO 1` 开始写。每完成一步就保存，在页面「我的练习」查看结果。
+4. 用页面清单验证自己的练习，包括正常值和边界值；结果符合预期后再手动勾选。
+5. 卡住时先展开思路提示，再看关键语法；完整答案放在最后，默认折叠。
+6. 完成后切到第二课，以同样方式阅读 `ProfileDemo.vue`、修改 `ProfilePractice.vue`。
+
+不需要先读懂 `App.vue`、教学页面和通用组件。它们负责组织课程，会用到后续课程才介绍的语法。不要一开始就复制完整答案：先写出一个 TODO，再对照效果。
+
+## 文件怎么分工
+
+```text
+src/
+├── main.js                          # 挂载应用、加载全局样式
+├── App.vue                          # 课程切换和页面外壳
+├── components/
+│   ├── CodeExample.vue              # 展示真实文件的逻辑 / 模板 / 完整源码
+│   └── ManualChecklist.vue          # 手动验证记录，不是自动测试
+├── lessons/
+│   ├── 01-counter/
+│   │   ├── CounterDemo.vue          # 读：完整的基础示例
+│   │   ├── CounterPractice.vue      # 写：带 TODO 的独立练习
+│   │   ├── CounterLesson.vue        # 教学内容、任务、验收和提示
+│   │   └── solutions/
+│   │       └── CounterSolution.vue  # 基础任务的完整参考答案
+│   └── 02-profile/
+│       ├── ProfileDemo.vue
+│       ├── ProfilePractice.vue
+│       ├── ProfileLesson.vue
+│       └── solutions/
+│           └── ProfileSolution.vue
+└── assets/
+    ├── base.css                     # 全局基础样式
+    └── main.css                     # 学习页面和案例样式
+```
+
+- **Demo**：保持可阅读的基础示例，先看它学语法。
+- **Practice**：你的练习区；起始代码可以运行，但刻意保留未完成的功能。请按 TODO 修改，不用改 Demo。
+- **Solution**：基础任务的一种完整实现；页面展开答案后可以操作它。它与练习状态相互独立，不会自动覆盖你的文件。
+- **Lesson**：任务说明与学习辅助，一开始可以跳过。
+
+案例样式集中在 `src/assets/main.css`，练习时先专注脚本和模板。源码面板通过 Vite 的 `?raw` 直接导入对应文件，不是另外维护的代码副本。
+
+## 第 1 课：计数器
+
+**知识点**：`ref`、文本插值、`@click`、`:disabled`。
+
+阅读顺序：`count` 的声明 → `increment / decrement / reset` → 模板中的事件和状态读取。
+
+在 `CounterPractice.vue` 完成：
+
+1. **TODO 1**：按 `step` 加减，按钮文字跟随步长，减法最低为 0。步长选择按钮已提供。
+2. **TODO 2**：计数最高为 10，到达上限时禁用加法按钮，函数内部也要限制上限。
+3. **TODO 3**：重置时计数回到 0、步长回到 2。
+
+起始代码仍按 1 加减，没有上限限制，重置暂时只重置计数。
+
+| 操作 | 完成后的预期结果 |
+| --- | --- |
+| 重置后加两次 | 步长为 2，计数为 2、4，按钮显示 + 2 / − 2 |
+| 接着改为步长 3，再加一次 | 计数为 7，按钮文字同步变化 |
+| 重置，步长 3 加三次，再用步长 2 加一次 | 9 → 10，加法禁用；减一次后为 8，加法恢复 |
+| 重置，步长 1 加一次，再用步长 2 减一次 | 1 → 0，不会出现负数 |
+| 步长 3 加一次后重置 | 计数 0、步长 2 |
+
+进阶：新增「加到上限」按钮，并在到达上限时禁用它。
+
+## 第 2 课：个人资料编辑器
+
+**知识点**：`reactive`、`v-model`、`computed`。
+
+阅读顺序：`profile` 的字段 → 三个 `v-model` → `displayName / bioLength` → 预览区域。
+
+在 `ProfilePractice.vue` 完成：
+
+1. **TODO 1**：把昵称、阶段、介绍三个字段的 `:value` 改为 `v-model`。
+2. **TODO 2**：用 `computed` 实现昵称去首尾空白、空值显示「未命名同学」、自动统计介绍长度。
+3. **TODO 3**：用计算属性实现错误提示和 `isValid`。昵称去首尾空白后为 1—12 个字符；介绍最多 80 个字符，可以为空。
+
+起始代码只把值显示到表单中，输入还不会写回 `profile`。昵称、字数和校验结果也是占位值，需要你补全。
+
+| 操作 | 完成后的预期结果 |
+| --- | --- |
+| 修改昵称、阶段和介绍 | 预览立即同步，不需要保存按钮 |
+| 昵称输入 `  小林  `，介绍输入 `学习 Vue` | 昵称显示小林，输入框保留空格，介绍长度 6 |
+| 昵称清空或只输入空格 | 显示错误、未命名同学、请先修正输入 |
+| 昵称从 12 字符增加到 13，再删回 12 | 合法 → 昵称错误 → 合法 |
+| 有效昵称下，介绍从 80 字符增加到 81，再删回 80 | 资料可用 → 介绍错误 → 资料可用 |
+| 重置资料后清空介绍 | 恢复默认资料后，空介绍长度为 0 且合法 |
+
+可在浏览器控制台用 `'a'.repeat(80)` 生成边界测试文本。本课以 `String.length` 计数，部分 emoji 占多个 UTF-16 编码单元；先使用普通汉字和英文字母练习。
+
+进阶：新增城市字段，并用计算属性生成「昵称 · 城市」的个人签名，处理城市为空的情况。
+
+## 学习路线
+
+| 案例 | 知识点 | 状态 |
+| --- | --- | --- |
+| 01 计数器 | ref、文本插值、事件绑定、属性绑定 | 示例、练习、提示与答案已实现 |
+| 02 个人资料编辑器 | reactive、v-model、computed | 示例、练习、提示与答案已实现 |
+| 03 待办事项列表 | v-for、key、v-if、数组更新 | 后续实现 |
+| 04 商品与购物车 | props、emit、组件拆分 | 后续实现 |
+| 05 用户搜索 | watch、异步查询、加载与错误状态 | 后续实现 |
+| 06 可挂载计时器 | 生命周期、组合式函数 | 后续实现 |
+
+## 常见问题
+
+**为什么选了步长 2，练习仍然只加 1？** 这是 TODO 1 的任务。参考示例与练习独立运行，必须修改 `CounterPractice.vue` 的函数和按钮文字。
+
+**为什么表单能输入，预览却不更新？** 起始练习只用 `:value` 单向显示。先完成 `v-model`，再完成计算属性；不要手动操作 DOM 更新预览。
+
+**什么时候写 `.value`？** 脚本中读写 `ref` 或读取 `computed` 时需要；模板会自动解包这里的顶层 ref。`reactive` 对象的属性直接读写，如 `profile.name`。
+
+**勾选完成意味着代码正确吗？** 不意味着。清单只是你自己操作后的确认，不会自动运行测试。页面不会把起始练习标记为自动测试通过。
+
+**切换课程、刷新和保存代码有什么区别？** 切换课程会卸载旧课程，演示和手动勾选重置；刷新会回到第一课并重置页面状态。保存的源码留在文件中。开发热更新可能重建组件，因此也不要依赖它保存运行时状态。
+
+**资料会发送到服务器吗？** 不会。当前两课仅在页面内演示，没有后端接口或持久化。
+
+**为什么改完没变化？** 确认运行的是 `npm run dev`，保存了正确的 `Practice.vue`，并观察「我的练习」区域。检查终端与浏览器控制台是否有语法错误。源码面板显示的是实际文件内容，可用它确认改动是否生效。
