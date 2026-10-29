@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第 08 课：表单进阶</title>
+  </head>
+  <body>
+    <!--
+      第 08 课：表单进阶
+      目标：掌握单选、多选、下拉框、文本域、字段分组与基础校验。
+      前置知识：先阅读第 07 课，理解 id、name、value 和 label 的关系。
+      本课仍只演示浏览器行为，没有后端，也不会保存提交数据。
+    -->
+    <h1>学习偏好调查</h1>
+    <p>带“必填”的字段需要填写。试着先直接提交，再逐步补全。</p>
+
+    <form action="#submission" method="get">
+      <!-- fieldset 将相关字段分为一组，legend 提供这组字段的名称。 -->
+      <fieldset>
+        <legend>一、学习方式</legend>
+        <!--
+          同一表单内，具有相同 name 的 radio 构成一组，只能选中一个。
+          每个选项仍要有不同的 id，供自己的 label 关联。
+          value 是提交的值，用户看到的说明由 label 提供。
+        -->
+        <p>偏好的学习时段（必选一项）：</p>
+        <p>
+          <input type="radio" id="time-morning" name="study_time" value="morning" required>
+          <label for="time-morning">早上</label>
+
+          <input type="radio" id="time-evening" name="study_time" value="evening" required>
+          <label for="time-evening">晚上</label>
+        </p>
+
+        <!--
+          checkbox 可独立选择。checked 指定初始选中状态。
+          本例使用相同 name：选中多个时，提交数据中会重复出现 topic 字段。
+          例如 topic=html&topic=css；未选中的复选框通常不会提交。
+          给某个 checkbox 加 required，只要求选中那一个，并非“这一组至少一个”。
+        -->
+        <p>感兴趣的内容（可以多选）：</p>
+        <p>
+          <input type="checkbox" id="topic-html" name="topic" value="html" checked>
+          <label for="topic-html">HTML</label>
+
+          <input type="checkbox" id="topic-css" name="topic" value="css">
+          <label for="topic-css">CSS</label>
+
+          <input type="checkbox" id="topic-js" name="topic" value="javascript">
+          <label for="topic-js">JavaScript</label>
+        </p>
+      </fieldset>
+
+      <fieldset>
+        <legend>二、个人计划</legend>
+        <p>
+          <label for="level">目前基础（必填）：</label>
+          <!-- select 创建下拉选择；option 的 value 是提交值，文字是显示名称。 -->
+          <select id="level" name="level" required>
+            <!-- 空 value 配合 required，让用户必须选择一个有实际值的选项。 -->
+            <option value="" selected>请选择</option>
+            <option value="beginner">完全零基础</option>
+            <option value="some-html">认识一些 HTML 标签</option>
+            <option value="practice">正在练习完整页面</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="learner-code">练习代号（必填）：</label>
+          <!--
+            pattern 指定整个输入值需要满足的模式，不要在两端加 /。
+            下面要求：首位为英文字母，之后为 2 到 11 位英文字母、数字或下划线。
+            pattern 不负责“非空”，所以还需要 required。
+            正则表达式可以以后单独学习，本节重点是理解格式约束。
+          -->
+          <input
+            type="text"
+            id="learner-code"
+            name="learner_code"
+            pattern="[A-Za-z][A-Za-z0-9_]{2,11}"
+            minlength="3"
+            maxlength="12"
+            aria-describedby="code-help"
+            required
+          >
+        </p>
+        <!-- aria-describedby 将输入框与补充说明关联；它引用的是说明元素的 id。 -->
+        <p id="code-help">使用 3～12 位英文字母、数字或下划线，首位必须是英文字母，例如 learner_1。</p>
+
+        <p>
+          <label for="goal">学习目标（必填，10～200 个字符）：</label>
+          <br>
+          <!--
+            textarea 是多行文本框，需要结束标签。
+            默认内容写在开始与结束标签之间，不通过 value 属性设置。
+            rows、cols 影响显示尺寸，不限制输入长度；长度用 minlength/maxlength。
+          -->
+          <textarea id="goal" name="goal" rows="4" cols="30" minlength="10" maxlength="200" placeholder="例如：我想独立完成一个个人介绍页面。" required></textarea>
+        </p>
+      </fieldset>
+
+      <fieldset>
+        <legend>三、只读与禁用</legend>
+        <!-- readonly 仍可聚焦，具有 name 时通常参与提交；disabled 不参与提交。 -->
+        <p>
+          <label for="course">当前课程（只读）：</label>
+          <input type="text" id="course" name="course" value="HTML" readonly>
+        </p>
+        <p>
+          <label for="future-course">后续课程（禁用）：</label>
+          <input type="text" id="future-course" name="future_course" value="CSS" disabled>
+        </p>
+      </fieldset>
+
+      <p>
+        <button type="submit">体验校验与提交</button>
+        <button type="reset">恢复初始值</button>
+      </p>
+    </form>
+
+    <h2 id="submission">提交说明</h2>
+    <p>浏览器校验通过后会尝试导航到本页；这里不会显示调查结果，也没有数据存储。</p>
+    <p>原生校验帮助用户填写，但真实网站仍需要服务器校验数据。</p>
+
+    <!--
+      动手练习：
+      1. 为学习时段增加“下午”，保持相同 name，设置独立 id 和 value。
+      2. 给下拉框新增一个选项，改变 selected，观察默认值和重置行为。
+      3. 先用 ab、1abc、abc 验证练习代号，再测试过短的学习目标。
+
+      常见错误：给每个 radio 设置不同 name，导致它们不能互斥。
+      布尔属性通过删除来关闭：checked="false" 仍表示初始选中。
+      readonly 只适用于支持它的控件，不能用它让 select 变成只读。
+    -->
+  </body>
+</html>

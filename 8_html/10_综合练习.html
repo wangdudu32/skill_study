@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第 10 课：个人介绍页综合练习</title>
+  </head>
+  <body>
+    <!--
+      第 10 课：个人介绍页综合练习
+      目标：综合使用文档结构、文本、链接、列表、表格、表单和语义化元素。
+
+      先打开浏览器查看页面，再回到源码寻找每一块内容对应的标签。
+      这是一个可以继续修改的完整示例。TODO 标记给出了具体练习位置。
+      先尝试自己修改，遇到不熟悉的标签时再回看前面的课程。
+
+      页面只有 HTML：表格内容不会自动计算，留言也不会自动保存。
+    -->
+
+    <!-- 让键盘用户可以直接跳过导航，进入主要内容。 -->
+    <a href="#main-content">跳到主要内容</a>
+
+    <header id="top">
+      <!-- TODO 1：将 title、h1 和下方介绍改成自己的内容，保持标题层级清晰。 -->
+      <h1>小明的个人介绍</h1>
+      <p>一名正在学习 HTML 的初学者，目标是独立完成自己的网页。</p>
+      <nav aria-label="个人介绍页导航">
+        <ul>
+          <li><a href="#about">关于我</a></li>
+          <li><a href="#skills">正在学习</a></li>
+          <li><a href="#projects">项目经历</a></li>
+          <li><a href="#schedule">学习计划</a></li>
+          <li><a href="#message">留言练习</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main id="main-content">
+      <section id="about">
+        <h2>关于我</h2>
+        <p>你好，我是小明。我喜欢阅读、散步，也喜欢研究网页是怎样构成的。</p>
+        <p>最近的学习原则是：<strong>每认识一个标签，就亲手写一个例子。</strong></p>
+        <p>我希望通过练习，理解页面内容为什么要这样组织。</p>
+      </section>
+
+      <section id="skills">
+        <h2>正在学习</h2>
+        <ul>
+          <li>用标题和段落组织文字。</li>
+          <li>用链接连接页面，并使用锚点定位内容。</li>
+          <li>用列表和表格表达不同类型的信息。</li>
+          <li>用表单收集输入，理解浏览器的原生校验。</li>
+        </ul>
+        <h3>我的练习流程</h3>
+        <ol>
+          <li>阅读示例源码，理解标签的作用。</li>
+          <li>修改一处内容，保存并刷新页面。</li>
+          <li>从空白文件开始，尝试重新写出同类结构。</li>
+        </ol>
+      </section>
+
+      <section id="projects">
+        <h2>项目经历</h2>
+        <!-- 一条项目介绍可以独立理解，这里使用 article。 -->
+        <article>
+          <h3>项目一：第一张网页</h3>
+          <p>为页面设置标题，使用段落介绍自己，并添加学习目标。</p>
+          <p><a href="01_基本结构.html">回顾第一课的页面结构</a></p>
+        </article>
+        <article>
+          <h3>项目二：学习安排表</h3>
+          <p>把学习内容整理为表格，并练习正确使用表头和单元格。</p>
+          <p><a href="06_表格.html">回顾第六课的表格示例</a></p>
+        </article>
+        <!-- TODO 2：新增第三个项目，用 article、h3、p 描述它，并添加相关课程链接。 -->
+      </section>
+
+      <section id="schedule">
+        <h2>学习计划</h2>
+        <table>
+          <caption>接下来三天的安排</caption>
+          <thead>
+            <tr>
+              <th scope="col">日期</th>
+              <th scope="col">任务</th>
+              <th scope="col">完成情况</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">第一天</th>
+              <td>完成个人介绍与页面导航</td>
+              <td>已完成</td>
+            </tr>
+            <tr>
+              <th scope="row">第二天</th>
+              <td>补充项目经历和学习计划</td>
+              <td>进行中</td>
+            </tr>
+            <tr>
+              <th scope="row">第三天</th>
+              <td>检查留言表单与所有链接</td>
+              <td>待开始</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="message">
+        <h2>留言练习</h2>
+        <p>这是表单结构练习，没有后端处理，留言不会保存或发送给任何人。</p>
+        <form action="#message-note" method="get">
+          <p>
+            <label for="visitor">称呼（必填）：</label>
+            <input type="text" id="visitor" name="visitor" maxlength="20" required>
+          </p>
+          <p>
+            <label for="subject">话题（必填）：</label>
+            <select id="subject" name="subject" required>
+              <option value="" selected>请选择话题</option>
+              <option value="html">HTML 学习</option>
+              <option value="project">项目练习</option>
+              <option value="suggestion">页面建议</option>
+            </select>
+          </p>
+          <p>
+            <label for="message-text">留言内容（必填，10～200 个字符）：</label>
+            <br>
+            <textarea id="message-text" name="message" rows="4" cols="30" minlength="10" maxlength="200" required></textarea>
+          </p>
+          <!-- TODO 3：新增“希望回复”复选框，设置独立 id、合适的 name/value 与 label。 -->
+          <p>
+            <button type="submit">体验提交</button>
+            <button type="reset">恢复初始值</button>
+          </p>
+        </form>
+        <p id="message-note">这里是固定说明。提交只会尝试导航到本页，不会生成留言记录。</p>
+      </section>
+    </main>
+
+    <footer>
+      <p>用 HTML 记录自己的学习进步。</p>
+      <p><a href="#top">回到顶部</a> · <a href="09_语义化结构.html">复习语义化结构</a></p>
+    </footer>
+
+    <!--
+      完成后自查：
+      1. 页面标题、个人介绍和项目内容是否已经换成自己的内容？
+      2. 导航链接是否都能跳到正确位置，文件链接是否都能打开？
+      3. 表格各行的列数是否一致，标题层级是否清晰？
+      4. 点击每个表单标签能否选中或聚焦对应控件？
+      5. 空表单能否被浏览器阻止提交，新增字段是否有 name？
+
+      延伸练习：参考第 04 课，将嵌入式图片示例加入“关于我”，重新编写 alt。
+    -->
+  </body>
+</html>

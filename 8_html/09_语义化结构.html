@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第 09 课：语义化结构</title>
+  </head>
+  <body>
+    <!--
+      第 09 课：语义化结构
+      目标：让元素的含义与内容的作用一致，组织一个清晰的页面。
+
+      本页结构：
+      body
+        header：页面介绍和主要导航
+        main：页面的主体内容
+          article：可以独立阅读的文章
+            header：文章自己的介绍
+            section：文章中的主题章节
+            footer：文章自己的补充信息
+          aside：与主体相关的补充内容
+        footer：整个页面的页脚
+
+      这些元素不会自动形成左右分栏，也不会自动带来复杂样式。
+      HTML 负责表达结构，布局和外观以后交给 CSS。
+    -->
+
+    <!-- header 可以属于页面，也可以属于 article 等内容区域。 -->
+    <header>
+      <h1>我的学习手记</h1>
+      <p>用有含义的标签组织内容。</p>
+      <!-- nav 表示主要导航区域，不必把页面中的每个链接都放进 nav。 -->
+      <nav aria-label="页面导航">
+        <!-- aria-label 为导航区域提供名称，帮助辅助技术区分不同区域。 -->
+        <ul>
+          <li><a href="#article">阅读文章</a></li>
+          <li><a href="#containers">了解通用容器</a></li>
+          <li><a href="#tips">查看学习提示</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <!-- main 表示主体内容。普通页面通常只有一个可见的 main。 -->
+    <main>
+      <!-- article 适合可独立阅读或复用的内容，例如文章、新闻或帖子。 -->
+      <article id="article">
+        <header>
+          <h2>如何选择 HTML 结构标签</h2>
+          <p>作者：HTML 学习者</p>
+        </header>
+
+        <!-- section 表示围绕同一主题的章节，通常应有能概括主题的标题。 -->
+        <section>
+          <h3>先问这段内容的作用</h3>
+          <p>它是主要导航、文章主体，还是补充说明？内容的作用决定适合的元素。</p>
+          <p>不要仅因为需要一个容器，就把每一层都写成 section。</p>
+        </section>
+
+        <section>
+          <h3>再梳理标题层级</h3>
+          <p>本页使用 h1 表示页面标题、h2 表示文章标题、h3 表示文章内章节标题。</p>
+          <p>把标题单独列出来时，应当还能看出内容的组织关系。</p>
+          <!-- section 和 article 不会自动替你调整 h1 到 h6 的等级。 -->
+        </section>
+
+        <section id="containers">
+          <h3>div 与 span：没有特定语义的容器</h3>
+          <!--
+            找不到合适的语义元素、但确实需要分组时，可以使用 div 或 span。
+            div 是通用的内容分组容器，浏览器默认以块级方式显示。
+            span 是文本中的通用行内容器，通常不单独换行。
+            “块级/行内”描述默认显示方式，CSS 可以改变它们的显示方式。
+          -->
+          <div>
+            <p>学习记录一：读懂源码。</p>
+            <p>学习记录二：动手修改。</p>
+          </div>
+          <!-- lang 为这一小段英文单独声明语言；span 本身不增加强调含义。 -->
+          <p>今天学到的英文表达是 <span lang="en">semantic HTML</span>。</p>
+          <p>如果要表达重要性或语气强调，应选择 strong 或 em 等相应元素。</p>
+        </section>
+
+        <!-- 这里的 footer 属于文章，补充的是这篇文章的信息。 -->
+        <footer>
+          <p>文章关键词：语义、结构、标题层级。</p>
+        </footer>
+      </article>
+
+      <!-- aside 表示与主体间接相关、可单独理解的内容；不一定显示在侧边。 -->
+      <aside id="tips">
+        <h2>学习提示</h2>
+        <ul>
+          <li>先确定内容结构，再考虑视觉外观。</li>
+          <li>用 Tab 键检查链接能否逐个获得焦点，再按 Enter 打开链接。</li>
+          <li>标签选得准确，可以帮助读屏工具等理解页面。</li>
+        </ul>
+      </aside>
+    </main>
+
+    <footer>
+      <p>这是整个页面的页脚。</p>
+      <p><a href="10_综合练习.html">进入第十课：综合练习</a></p>
+    </footer>
+
+    <!--
+      动手练习：
+      1. 为文章增加一个 section，主题是“我的学习方法”，并选择合适的标题等级。
+      2. 给新章节添加 id，在顶部 nav 中增加对应链接。
+      3. 找出本页两个 header 和两个 footer，解释它们分别属于谁。
+    -->
+  </body>
+</html>

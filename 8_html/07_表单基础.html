@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第 07 课：表单基础</title>
+  </head>
+  <body>
+    <!--
+      第 07 课：表单基础
+      目标：认识 form、label、input、button，理解字段如何组成提交数据。
+
+      三个容易混淆的属性：
+      id：标识页面中的元素，供 label、锚点等关联；同一页面中不能重复。
+      name：提交数据时使用的字段名，没有 name 的普通输入框不会提交其值。
+      value：字段的值；在文本输入框中，源码里的 value 设置初始值。
+
+      label 的 for 对应 input 的 id，不是 name。
+      点击标签可聚焦对应输入框，读屏工具也能据此读出字段名称。
+    -->
+    <h1>学习报名表：基础字段</h1>
+    <p>本页演示浏览器自带的表单功能。提交会重新导航到本页，没有后台接收或保存数据。</p>
+
+    <!--
+      action 指定提交目标。本例的 #submission 指向本页的提交说明。
+      method="get" 把字段编码到目标 URL 的查询字符串中，适合搜索等场景。
+      例如 nickname=learner 表示 nickname 字段的值是 learner。
+      地址栏中的中文可能显示为编码后的形式。
+
+      本地 file 地址的具体提交行为可能因浏览器而异。
+      本例不使用 POST：POST 通常需要服务器端的处理接口。
+      HTML 只定义表单结构与提交方式，不会自动创建账号或保存报名信息。
+    -->
+    <form action="#submission" method="get">
+      <p>
+        <label for="nickname">学习昵称（必填，最多 20 个字符）：</label>
+        <!-- text 是普通单行文本；required 表示必填；maxlength 限制长度。 -->
+        <input
+          type="text"
+          id="nickname"
+          name="nickname"
+          value="HTML学习者"
+          maxlength="20"
+          required
+        >
+      </p>
+
+      <p>
+        <label for="email">示例邮箱（选填）：</label>
+        <!--
+          email 让浏览器进行基本格式检查，但不验证邮箱是否真实存在。
+          placeholder 是输入提示，不是字段的值，也不能代替 label。
+        -->
+        <input type="email" id="email" name="email" placeholder="student@example.com">
+      </p>
+
+      <p>
+        <label for="days">本月计划学习天数（1 到 31）：</label>
+        <!-- number 接收数值，min/max 规定范围，step="1" 规定步长。 -->
+        <input type="number" id="days" name="days" min="1" max="31" step="1" value="7" required>
+      </p>
+
+      <p>
+        <label for="start-date">计划开始日期（选填）：</label>
+        <!-- date 的输入界面随浏览器而异；有效提交值采用 YYYY-MM-DD 格式。 -->
+        <input type="date" id="start-date" name="start_date">
+      </p>
+
+      <p>
+        <!-- submit 触发表单校验，通过后再提交；button 内的文字是按钮名称。 -->
+        <button type="submit">体验提交</button>
+        <!-- reset 恢复源码定义的初始值，不一定把所有字段清空。 -->
+        <button type="reset">恢复初始值</button>
+      </p>
+    </form>
+
+    <h2>单独观察密码输入框</h2>
+    <p>
+      <label for="password-demo">示例文字：</label>
+      <!--
+        password 通常用圆点等符号遮住输入内容，但这种显示方式不代表加密。
+        此控件在 form 外且未通过 form 属性关联表单，因此不参与上面的提交。
+        只用示例文字观察效果即可。
+      -->
+      <input type="password" id="password-demo" autocomplete="new-password" placeholder="输入示例文字">
+    </p>
+
+    <h2 id="submission">提交说明</h2>
+    <p>此处是固定说明，不是提交成功提示。页面没有处理或存储报名信息。</p>
+    <p>可以观察地址栏是否出现字段名与值；重新打开的页面仍显示源码中定义的初始值。</p>
+
+    <!--
+      动手练习：
+      1. 清空昵称后提交；再填写昵称并输入不完整的邮箱，观察浏览器的校验提示。
+      2. 新增“城市”文本框，分别设置 id、name，并添加正确关联的 label。
+      3. 修改昵称和学习天数，再点击“恢复初始值”，观察恢复到了什么内容。
+
+      常见错误：只写 id 不写 name；label 的 for 指向错误的 id。
+      form 不能相互嵌套。表单内的 button 应明确写 type，避免意外提交。
+      required 是布尔属性：出现就启用，写 required="false" 也不会关闭它。
+    -->
+  </body>
+</html>

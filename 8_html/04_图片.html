@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第 04 课：图片</title>
+  </head>
+  <body>
+    <!--
+      第 04 课：图片
+      目标：认识 img 的 src、alt、width、height，以及图文说明的写法。
+
+      常见写法：<img src="images/mountain.jpg" alt="蓝天下的山峰">
+      其中 images/mountain.jpg 是图片相对于当前页面的路径。
+      src 也可以使用完整的 https URL，但那样通常需要联网。
+
+      为了只保留 HTML 源码文件，本课把简单图形以 data URL 嵌入 src。
+      data URL 就是把资源内容直接写进地址，不需要另建图片文件。
+      本课不要求掌握 SVG 或地址编码，先重点观察 img 的属性。
+    -->
+    <h1>在网页中插入图片</h1>
+
+    <h2>一、图片地址、替代文字与尺寸</h2>
+    <!--
+      img 是空元素，不写结束标签。
+      src 指向图片；alt 为图片提供文字替代，供读屏工具等使用。
+      当图片加载失败时，浏览器也可能显示 alt。
+      alt 应表达图片在当前上下文中传递的信息，不必机械地写“这是一张图片”。
+      width 和 height 使用不带单位的整数，帮助浏览器提前预留空间。
+      本图原始尺寸为 360 × 180，宽高比为 2:1。
+    -->
+    <img
+      src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='360' height='180' viewBox='0 0 360 180'%3E%3Crect width='360' height='180' fill='%23dbeafe'/%3E%3Ccircle cx='285' cy='45' r='24' fill='%23facc15'/%3E%3Cpolygon points='0,180 110,35 230,180' fill='%2315803d'/%3E%3Cpolygon points='140,180 255,70 360,180' fill='%234ade80'/%3E%3C/svg%3E"
+      alt="浅蓝色天空下有两座绿色山峰，右上方挂着黄色太阳"
+      width="360"
+      height="180"
+    >
+    <p>这张图片的内容直接保存在本文件中，离线也可以查看。</p>
+
+    <h2>二、图片与图注</h2>
+    <!--
+      figure 表示可独立引用的图、示例等内容，也不只用于图片。
+      figcaption 是 figure 的可见说明，放在 figure 内部的开头或结尾。
+      图注与 alt 用途不同：图注提供上下文，alt 提供图像内容的文字替代。
+    -->
+    <figure>
+      <img
+        src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='150' viewBox='0 0 300 150'%3E%3Crect width='300' height='150' fill='%23f1f5f9'/%3E%3Ccircle cx='65' cy='75' r='35' fill='%23f97316'/%3E%3Crect x='130' y='40' width='70' height='70' fill='%232563eb'/%3E%3C/svg%3E"
+        alt="左侧是橙色圆形，右侧是蓝色正方形"
+        width="300"
+        height="150"
+      >
+      <figcaption>图 1：用两种几何图形练习编写图片说明。</figcaption>
+    </figure>
+
+    <h2>三、装饰性图片</h2>
+    <!--
+      纯装饰、不传递额外信息的图片可以设置 alt=""，让读屏工具跳过它。
+      空 alt 与完全省略 alt 不同，省略时读屏工具可能会读出文件名。
+      是否属于装饰性图片，需要根据图片在当前内容中的作用判断。
+    -->
+    <img
+      src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='8'%3E%3Crect width='240' height='8' rx='4' fill='%2394a3b8'/%3E%3C/svg%3E"
+      alt=""
+      width="240"
+      height="8"
+    >
+    <p>上方的灰色短线只起装饰作用，正文内容不依赖它。</p>
+
+    <!--
+      动手练习：
+      1. 把第一张图改为 width="240"、height="120"，观察等比例缩小。
+      2. 临时把第一张图的 src 改成 missing.jpg，观察失败状态，再恢复。
+      3. 修改图 1 的 figcaption，并思考它与 alt 分别在描述什么。
+
+      常见错误：src 路径写错；缺少 alt；随意改变宽高比导致图像变形。
+      title 属性不是 alt 的替代品。
+    -->
+  </body>
+</html>

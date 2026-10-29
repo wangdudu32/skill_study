@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第 06 课：表格</title>
+  </head>
+  <body>
+    <!--
+      第 06 课：表格
+      目标：组织二维数据，理解行、单元格、表头与合并单元格。
+      table 表示表格，tr 表示一行，th 表示表头单元格，td 表示数据单元格。
+      表格适合课程表、统计数据等，不适合拿来排整个网页的布局。
+      本课关注结构，没有添加 CSS；默认没有网格线也不影响它是一个表格。
+    -->
+    <h1>用表格展示学习计划</h1>
+
+    <h2>一、基本结构</h2>
+    <table>
+      <!-- caption 是表格标题，放在 table 内部的前面。 -->
+      <caption>第一周学习安排</caption>
+      <!-- thead、tbody、tfoot 分别组织表头、主要数据与汇总信息。 -->
+      <thead>
+        <tr>
+          <!-- scope="col" 表示这个表头说明对应的列，有助于理解数据关系。 -->
+          <th scope="col">日期</th>
+          <th scope="col">内容</th>
+          <th scope="col">时长（分钟）</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <!-- scope="row" 表示这个表头说明对应的行。 -->
+          <th scope="row">周一</th>
+          <td>基本结构与文本</td>
+          <td>20</td>
+        </tr>
+        <tr>
+          <th scope="row">周二</th>
+          <td>链接与图片</td>
+          <td>30</td>
+        </tr>
+        <tr>
+          <th scope="row">周三</th>
+          <td>列表与表格</td>
+          <td>30</td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <th scope="row">合计</th>
+          <td>3 天</td>
+          <!-- HTML 不会自动计算，80 是手写的数据。 -->
+          <td>80</td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <h2>二、合并单元格</h2>
+    <!--
+      rowspan="2"：当前单元格占据两行。
+      colspan="2"：当前单元格占据两列。
+      被合并占据的位置不能再重复写单元格，否则后续内容可能错位。
+    -->
+    <table>
+      <caption>周末复习安排</caption>
+      <thead>
+        <tr>
+          <th scope="col">日期</th>
+          <th scope="col">时间</th>
+          <th scope="col">内容</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td rowspan="2">周六</td>
+          <td>上午</td>
+          <td>阅读示例</td>
+        </tr>
+        <tr>
+          <!-- 第一列已由上面的“周六”占据，这一行只需要另外两个单元格。 -->
+          <td>下午</td>
+          <td>动手练习</td>
+        </tr>
+        <tr>
+          <td>周日</td>
+          <!-- 这个单元格同时占据“时间”和“内容”两列。 -->
+          <td colspan="2">全天自由复习</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!--
+      动手练习：
+      1. 给第一张表添加“周四”一行，再手动更新汇总天数和分钟数。
+      2. 给第一张表新增“完成情况”一列，注意表头、数据和汇总行都要对齐。
+      3. 把第二张表的周六增加为三个时段，修改 rowspan 并补充对应行。
+
+      检查方法：把合并单元格展开想象成小格子，各行应覆盖相同数量的列。
+      表格的边框、颜色和间距属于 CSS 内容，后续再学习。
+    -->
+  </body>
+</html>
